@@ -37,6 +37,16 @@ data class TerminalLine(
     val timestamp: Long = System.currentTimeMillis()
 )
 
+data class CaptureInterfaceOption(
+    val id: String,
+    val name: String,
+    val type: String,
+    val ipAddress: String,
+    val status: String,
+    val activity: List<Int>,
+    val selected: Boolean = false
+)
+
 class WireRifterViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = NetworkRepository(application)
 
@@ -52,6 +62,20 @@ class WireRifterViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _isCaptureActive = MutableStateFlow(false)
     val isCaptureActive: StateFlow<Boolean> = _isCaptureActive.asStateFlow()
+
+    private val _showInterfaceSelection = MutableStateFlow(true)
+    val showInterfaceSelection: StateFlow<Boolean> = _showInterfaceSelection.asStateFlow()
+
+    private val _captureInterfaces = MutableStateFlow(
+        listOf(
+            CaptureInterfaceOption("wlan0", "wlan0", "Wi-Fi", "192.168.1.105", "Ready", listOf(2, 5, 3, 8, 12, 9, 6, 11), selected = true),
+            CaptureInterfaceOption("rmnet0", "rmnet0", "Mobile Data", "10.84.22.7", "Standby", listOf(1, 1, 2, 1, 3, 2, 2, 1)),
+            CaptureInterfaceOption("tun0", "tun0", "VPN", "10.8.0.2", "Available", listOf(0, 0, 2, 4, 2, 0, 1, 3)),
+            CaptureInterfaceOption("lo", "lo", "Loopback", "127.0.0.1", "Local", listOf(1, 0, 1, 0, 1, 0, 1, 0)),
+            CaptureInterfaceOption("ap0", "ap0", "Hotspot", "192.168.43.1", "Dormant", listOf(0, 0, 0, 1, 0, 0, 1, 0))
+        )
+    )
+    val captureInterfaces: StateFlow<List<CaptureInterfaceOption>> = _captureInterfaces.asStateFlow()
 
     private val _isDeviceScanning = MutableStateFlow(false)
     val isDeviceScanning: StateFlow<Boolean> = _isDeviceScanning.asStateFlow()
@@ -157,6 +181,28 @@ class WireRifterViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     // --- Action Methods ---
+
+    fun toggleCaptureInterface(id: String) {
+        _captureInterfaces.value = _captureInterfaces.value.map { item ->
+            if (item.id == id) item.copy(selected = !item.selected) else item
+        }
+    }
+
+    fun requestInterfaceSelection() {
+        if (_isCaptureActive.value) return
+        _showInterfaceSelection.value = true
+    }
+
+    fun startCaptureFromSelectedInterfaces() {
+        val current = _captureInterfaces.value
+        if (current.none { it.selected }) {
+            _captureInterfaces.value = current.mapIndexed { index, item ->
+                if (index == 0) item.copy(selected = true) else item
+            }
+        }
+        _showInterfaceSelection.value = false
+        startSnifferCapture()
+    }
 
     fun startSnifferCapture() {
         if (_isCaptureActive.value) return
