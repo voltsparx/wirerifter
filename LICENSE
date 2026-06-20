@@ -1,54 +1,55 @@
-WireRifter Open Attribution License 1.0
+------------------------------------------------------------------------------
+SPDX-License-Identifier: LicenseRef-Proprietary
+------------------------------------------------------------------------------
 
-Copyright (c) 2026 Voltsparx
+Copyright (c) 2026 voltsparx
+All rights reserved.
 
-Project: WireRifter
+WireRifter is proprietary, source-available software.
+
+Permission is granted to use WireRifter solely for personal, educational, or
+internal security purposes on systems you own or are explicitly authorized to
+monitor.
+
+Any other use, including modification, redistribution, commercial use,
+rebranding, sublicensing, public hosting of modified copies, or publication of
+derivative works, requires prior written permission from the copyright holder.
+
+You may not:
+
+1. Obscure, remove, or alter copyright, license, or attribution notices.
+2. Claim authorship or ownership of WireRifter or its derivative works.
+3. Redistribute WireRifter, in whole or in part, in source or binary form,
+   without prior written permission.
+4. Publish, sell, sublicense, rebrand, or package modified versions without
+   prior written permission.
+5. Use WireRifter for unauthorized penetration testing, hacking, stalking,
+   harassment, surveillance, credential theft, network abuse, or any illegal
+   activity.
+
+Attribution must be retained in any permitted use:
+
+    "WireRifter (c) 2026 voltsparx. All rights reserved.
+    Original project: https://github.com/voltsparx/wirerifter"
+
++-------------------------------------------------------------+
+| IMPORTANT: This project is proprietary. Permitted use       |
+| requires that the original copyright notice remains intact. |
+| Removing or altering attribution constitutes plagiarism and |
+| may be pursued through DMCA takedown or other remedies.     |
++-------------------------------------------------------------+
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, SECURITY, AND NON-INFRINGEMENT. IN NO EVENT
+SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+For permissions beyond personal, educational, or internal authorized use,
+contact:
+
+voltsparx
+Email: voltsparx@gmail.com
 Repository: https://github.com/voltsparx/wirerifter
-
-1. Permission
-
-Permission is granted, free of charge, to any person obtaining a copy of this software and associated documentation files to use, study, copy, build, run, modify, merge, publish, and redistribute the software, subject to the conditions below.
-
-2. Attribution Requirements
-
-Any copy, fork, modification, redistribution, public deployment, packaged build, documentation page, app-store listing, article, video, demo, research report, or derivative work based on this software must provide clear and reasonable attribution to the original project.
-
-Attribution must include all of the following:
-
-- The project name: WireRifter
-- The original author credit: Voltsparx - Niyor Kalita
-- A link to the original repository: https://github.com/voltsparx/wirerifter
-- A statement that the work is based on or derived from WireRifter
-- A copy of, or direct link to, this license
-
-For graphical applications or packaged builds, attribution must appear in at least one user-visible place, such as an About screen, credits screen, settings page, documentation page, README, package metadata, or equivalent location.
-
-3. Modified Versions
-
-Modified versions are allowed, but they must be clearly marked as modified. A modified version must not imply that it is the official WireRifter project unless explicit written permission is granted by the original author.
-
-Modified versions must include reasonable change notice information, such as:
-
-- The name or handle of the modifier
-- The date or version of the modification
-- A short summary of material changes
-
-4. Preservation of Notices
-
-Copyright notices, attribution notices, project credits, and this license text must not be removed from source distributions or substantial binary/documentation redistributions.
-
-5. Naming and Endorsement
-
-You may refer to WireRifter for attribution and compatibility description. You may not use the WireRifter name, author name, logos, icons, repository identity, or project branding to suggest endorsement, official status, or authorship of a modified work without explicit written permission.
-
-6. Redistribution
-
-Redistribution in source or binary form is allowed only when the attribution requirements, modified-version requirements, and notice-preservation requirements of this license are satisfied.
-
-7. No Warranty
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, SECURITY, NON-INFRINGEMENT, OR ERROR-FREE OPERATION. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGE, LOSS, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OF THE SOFTWARE.
-
-8. Acceptance
-
-By using, modifying, publishing, redistributing, or building upon this software, you agree to follow this license.
