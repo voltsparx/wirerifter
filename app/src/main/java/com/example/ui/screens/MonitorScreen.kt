@@ -1,28 +1,33 @@
 package com.example.ui.screens
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RectangleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Shield
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
@@ -30,9 +35,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.example.data.database.PacketEntity
-import com.example.ui.theme.*
+import com.example.ui.theme.BorderDark
+import com.example.ui.theme.CyberGreen
+import com.example.ui.theme.CyberPrimary
+import com.example.ui.theme.CyberRed
+import com.example.ui.theme.DarkBg
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceElevated
+import com.example.ui.theme.TextGray
+import com.example.ui.theme.TextWhite
 import com.example.ui.viewmodel.WireRifterViewModel
 
 @Composable
@@ -41,906 +53,573 @@ fun MonitorScreen(
     modifier: Modifier = Modifier
 ) {
     val isCapturing by viewModel.isCaptureActive.collectAsState()
-    val livePackets by viewModel.livePacketFeed.collectAsState()
-    val activeDevices by viewModel.activeDeviceCount.collectAsState()
-    val securityAlerts by viewModel.securityAlertCount.collectAsState()
-    val flowRate by viewModel.liveNetworkSpeed.collectAsState()
+    val packets by viewModel.livePacketFeed.collectAsState()
     val selectedPacket by viewModel.selectedPacketForAudit.collectAsState()
+    val flowRate by viewModel.liveNetworkSpeed.collectAsState()
+    var panelOpen by remember { mutableStateOf(false) }
+    var displayFilter by remember { mutableStateOf("") }
+    var panelTab by remember { mutableStateOf("Capture") }
+    var scrollLocked by remember { mutableStateOf(false) }
 
-    var protocolFilter by remember { mutableStateOf("ALL") }
-    var queryText by remember { mutableStateOf("") }
-
-    // Filter packets locally with protocol chips plus an analyst query bar.
-    val filteredPackets = remember(livePackets, protocolFilter, queryText) {
-        livePackets.filter { packet ->
-            val protocolMatches = protocolFilter == "ALL" || packet.protocol.equals(protocolFilter, ignoreCase = true)
-            protocolMatches && packetMatchesQuery(packet, queryText)
-        }
+    val filteredPackets = remember(packets, displayFilter) {
+        packets.filter { packetMatchesQuery(it, displayFilter) }
     }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(DarkBg)
-            .padding(16.dp)
     ) {
-        // --- 1. Top Section Info Header ---
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = "Live Active Feed",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextWhite,
-                    letterSpacing = 0.sp
-                )
-                Text(
-                    text = "Bound Interface: wlan0 (PROMISCUOUS)",
-                    fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace,
-                    color = TextGray
-                )
-            }
-            
-            // Live pulsing monitor indicator
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (isCapturing) Color(0x2200E676) else Color(0x2294A3B8))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(6.dp)
-                            .clip(CircleShape)
-                            .background(if (isCapturing) CyberGreen else TextGray)
-                    )
-                    Text(
-                        text = if (isCapturing) "SWEEPER ACTIVE" else "IDLE",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isCapturing) CyberGreen else TextGray,
-                        fontFamily = FontFamily.Monospace
-                    )
+        Column(modifier = Modifier.fillMaxSize()) {
+            MonitorToolbar(
+                isCapturing = isCapturing,
+                packetCount = filteredPackets.size,
+                flowRate = flowRate,
+                scrollLocked = scrollLocked,
+                onTogglePanel = { panelOpen = !panelOpen },
+                onToggleScrollLock = { scrollLocked = !scrollLocked },
+                onCapture = {
+                    if (isCapturing) viewModel.stopSnifferCapture() else viewModel.requestInterfaceSelection()
                 }
-            }
+            )
+
+            PacketTable(
+                packets = filteredPackets,
+                selected = selectedPacket,
+                onSelect = viewModel::selectPacketForInspector,
+                modifier = Modifier
+                    .weight(if (selectedPacket == null) 1f else 0.56f)
+                    .fillMaxWidth()
+            )
+
+            Divider(thickness = 1.dp, color = CyberPrimary.copy(alpha = 0.65f))
+
+            PacketDetailPanel(
+                packet = selectedPacket,
+                modifier = Modifier
+                    .weight(0.25f)
+                    .fillMaxWidth()
+            )
+
+            Divider(thickness = 1.dp, color = BorderDark)
+
+            PacketBytesPanel(
+                packet = selectedPacket,
+                modifier = Modifier
+                    .weight(0.19f)
+                    .fillMaxWidth()
+            )
         }
 
-        // --- 2. Stat Widgets (Matching Sleek Theme) ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Widget: Connected Nodes
-            Box(
+        if (panelOpen) {
+            SlidePanel(
+                filter = displayFilter,
+                onFilterChange = { displayFilter = it },
+                panelTab = panelTab,
+                onPanelTabChange = { panelTab = it },
+                isCapturing = isCapturing,
+                onStartStop = {
+                    if (isCapturing) viewModel.stopSnifferCapture() else viewModel.requestInterfaceSelection()
+                },
+                onClose = { panelOpen = false },
                 modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(DarkSurface)
-                    .border(1.dp, BorderDark, RoundedCornerShape(24.dp))
-                    .padding(16.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = "Active Devices",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = CyberPrimary,
-                        letterSpacing = 1.sp
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = String.format("%02d", activeDevices),
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Light,
-                            color = TextWhite
-                        )
-                        Text(
-                            text = "LIVE",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = CyberSecondary,
-                            modifier = Modifier.padding(bottom = 6.dp)
-                        )
-                    }
-                }
-            }
-
-            // Widget: Security Alerts (Matches the 31111D red border/background card from Sleek HTML)
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFF31111D))
-                    .border(1.dp, Color(0xFF93000A), RoundedCornerShape(24.dp))
-                    .padding(16.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = "Security Alerts",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFFF2B8B5),
-                        letterSpacing = 1.sp
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = String.format("%02d", securityAlerts),
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Light,
-                            color = Color(0xFFF2B8B5)
-                        )
-                        if (securityAlerts > 0) {
-                            Text(
-                                text = "RISK",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = CyberRed,
-                                modifier = Modifier.padding(bottom = 6.dp)
-                            )
-                        }
-                    }
-                }
-            }
+                    .fillMaxHeight()
+                    .width(318.dp)
+                    .align(Alignment.TopStart)
+            )
         }
 
-        // --- 3. Filter Chips Row ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            val chips = listOf("ALL", "TCP", "UDP", "DNS", "HTTP", "ARP")
-            chips.forEach { item ->
-                val isSelected = protocolFilter == item
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (isSelected) CyberPrimary else DarkSurface)
-                        .border(1.dp, if (isSelected) CyberPrimary else BorderDark, RoundedCornerShape(12.dp))
-                        .clickable { protocolFilter = item }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = item,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isSelected) DarkBg else TextWhite,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-            }
-        }
-
-        OutlinedTextField(
-            value = queryText,
-            onValueChange = { queryText = it },
-            singleLine = true,
-            leadingIcon = {
-                Icon(Icons.Default.FilterAlt, contentDescription = null, tint = CyberPrimary)
-            },
-            trailingIcon = {
-                if (queryText.isNotBlank()) {
-                    IconButton(onClick = { queryText = "" }) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear packet query", tint = TextGray)
-                    }
-                }
-            },
-            placeholder = {
-                Text(
-                    "filter: ip=192.168.1.45 port=53 proto=dns alert scan password",
-                    fontSize = 11.sp,
-                    color = TextGray
-                )
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = TextWhite,
-                unfocusedTextColor = TextWhite,
-                focusedBorderColor = CyberPrimary,
-                unfocusedBorderColor = BorderDark,
-                cursorColor = CyberPrimary,
-                focusedContainerColor = DarkSurface,
-                unfocusedContainerColor = DarkSurface
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-                .testTag("packet_query_bar")
-        )
-
-        // --- 4. Main live Packet list container (Elevated container matching the sleek CSS) ---
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(24.dp))
-                .padding(14.dp)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Packet Trace Logs",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextWhite
-                    )
-                    
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(CyberSecondary.copy(alpha = 0.2f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = if (isCapturing) "LIVE (${String.format("%.1f", flowRate)} MB/s) - ${filteredPackets.size} shown" else "STREAM STOPPED - ${filteredPackets.size} shown",
-                            fontSize = 9.sp,
-                            color = CyberPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                }
-
-                if (filteredPackets.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.NetworkWifi,
-                                contentDescription = null,
-                                tint = BorderDark,
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Text(
-                                text = if (isCapturing) "Listening on interface..." else "Interactive network adapter is quiet.",
-                                color = TextGray,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily.Monospace
-                            )
-                            if (!isCapturing) {
-                                Button(
-                                    onClick = { viewModel.startSnifferCapture() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = CyberSecondary),
-                                    modifier = Modifier.testTag("launch_sniff_btn")
-                                ) {
-                                    Text("Activate Interface Capture", color = TextWhite, fontSize = 11.sp)
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(filteredPackets) { pkt ->
-                            PacketRow(packet = pkt) {
-                                viewModel.selectPacketForInspector(pkt)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // --- 5. Custom Floating Action Controller ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            Box(
+        if (scrollLocked && packets.size > filteredPackets.size) {
+            Text(
+                text = "LIVE - ${packets.size - filteredPackets.size} new packets",
+                color = DarkBg,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
                     .background(CyberPrimary)
-                    .clickable {
-                        if (isCapturing) {
-                            viewModel.stopSnifferCapture()
-                        } else {
-                            viewModel.startSnifferCapture()
-                        }
-                    }
-                    .testTag("sniffer_controller_fab"),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (isCapturing) Icons.Default.Stop else Icons.Default.PlayArrow,
-                    contentDescription = "Trigger Capture Mode",
-                    tint = DarkBg,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
+                    .clickable { scrollLocked = false }
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
+            )
         }
     }
+}
 
-    // --- Packet Inspection Modal ---
-    selectedPacket?.let { pkt ->
-        PacketInspectorDialog(
-            packet = pkt,
-            viewModel = viewModel,
-            onDismiss = { viewModel.selectPacketForInspector(null) }
+@Composable
+private fun MonitorToolbar(
+    isCapturing: Boolean,
+    packetCount: Int,
+    flowRate: Double,
+    scrollLocked: Boolean,
+    onTogglePanel: () -> Unit,
+    onToggleScrollLock: () -> Unit,
+    onCapture: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(36.dp)
+            .background(DarkSurfaceElevated)
+            .border(1.dp, BorderDark)
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        RectTextButton(text = ">", onClick = onTogglePanel, width = 34.dp)
+        RectTextButton(
+            text = if (isCapturing) "Stop" else "Start",
+            onClick = onCapture,
+            width = 56.dp,
+            active = isCapturing
+        )
+        RectTextButton(
+            text = if (scrollLocked) "Unlock" else "Lock",
+            onClick = onToggleScrollLock,
+            width = 58.dp
+        )
+        Text(
+            text = "Packets=$packetCount Rate=${String.format("%.1f", flowRate)}MB/s",
+            color = TextGray,
+            fontSize = 10.sp,
+            fontFamily = FontFamily.Monospace,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        androidx.compose.material3.Icon(
+            imageVector = if (isCapturing) Icons.Default.Stop else Icons.Default.PlayArrow,
+            contentDescription = null,
+            tint = if (isCapturing) CyberRed else CyberGreen,
+            modifier = Modifier.size(16.dp)
+        )
+        androidx.compose.material3.Icon(
+            imageVector = Icons.Default.Pause,
+            contentDescription = null,
+            tint = if (scrollLocked) CyberPrimary else TextGray,
+            modifier = Modifier.size(16.dp)
         )
     }
 }
 
 @Composable
-fun PacketRow(
-    packet: PacketEntity,
-    onClick: () -> Unit
+private fun SlidePanel(
+    filter: String,
+    onFilterChange: (String) -> Unit,
+    panelTab: String,
+    onPanelTabChange: (String) -> Unit,
+    isCapturing: Boolean,
+    onStartStop: () -> Unit,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val highlightColor = when {
-        packet.isSuspicious -> CyberRed
-        packet.protocol == "DNS" -> CyberAmber
-        packet.protocol == "HTTP" -> CyberCyan
-        packet.protocol == "TCP" -> CyberTertiary
-        else -> TextGray
+    Column(
+        modifier = modifier
+            .background(DarkSurface)
+            .border(1.dp, CyberPrimary)
+            .padding(6.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RectTextButton("<", onClose, width = 34.dp)
+            Text(
+                text = "Display Filter",
+                color = TextWhite,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 6.dp)
+            )
+        }
+        OutlinedTextField(
+            value = filter,
+            onValueChange = onFilterChange,
+            singleLine = true,
+            placeholder = { Text("Apply a display filter <Ctrl-/>", color = TextGray, fontSize = 10.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                color = TextWhite,
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace
+            ),
+            shape = RectangleShape,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = CyberPrimary,
+                unfocusedBorderColor = BorderDark,
+                cursorColor = CyberPrimary,
+                focusedContainerColor = DarkBg,
+                unfocusedContainerColor = DarkBg,
+                focusedTextColor = TextWhite,
+                unfocusedTextColor = TextWhite
+            ),
+            modifier = Modifier.fillMaxWidth().height(48.dp)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+            RectTextButton("Apply", {}, modifier = Modifier.weight(1f))
+            RectTextButton("Clear", { onFilterChange("") }, modifier = Modifier.weight(1f))
+        }
+        LazyRow(modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
+            items(listOf("Go", "Capture", "Analyse", "Statistics", "Telephony", "Wireless", "Tools", "Help")) { tab ->
+                val selected = tab == panelTab
+                Text(
+                    text = tab,
+                    color = if (selected) DarkBg else TextWhite,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .background(if (selected) CyberPrimary else DarkSurfaceElevated)
+                        .border(1.dp, BorderDark)
+                        .clickable { onPanelTabChange(tab) }
+                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                )
+            }
+        }
+        PanelTabContent(panelTab, isCapturing, onStartStop)
+    }
+}
+
+@Composable
+private fun PanelTabContent(
+    tab: String,
+    isCapturing: Boolean,
+    onStartStop: () -> Unit
+) {
+    val lines = when (tab) {
+        "Go" -> listOf("Go to packet number", "First packet", "Last packet", "Previous packet", "Next packet", "Go to conversation")
+        "Capture" -> listOf(if (isCapturing) "Stop capture" else "Start capture", "Restart capture", "Capture options", "Capture filter", "Refresh interfaces")
+        "Analyse" -> listOf("Display filters", "Apply as filter", "Prepare as filter", "Conversation filter", "Enabled protocols", "Decode as", "Follow stream", "Expert information")
+        "Statistics" -> listOf("Capture properties", "Protocol hierarchy", "Conversations", "Endpoints", "Packet lengths", "I/O graph", "TCP stream graph", "Flow graph")
+        "Telephony" -> listOf("VoIP calls", "SIP flows", "RTP streams", "RTSP", "Mobile network summary")
+        "Wireless" -> listOf("WLAN traffic", "Bluetooth interfaces", "802.11 statistics", "Hotspot activity")
+        "Tools" -> listOf("Firewall rule generator", "Plaintext credential watch", "Custom signature rules", "Export objects")
+        else -> listOf("About WireRifter", "Shortcut reference", "Filter reference", "Protocol reference")
     }
 
+    LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
+        items(lines) { line ->
+            Text(
+                text = line,
+                color = TextWhite,
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(28.dp)
+                    .background(DarkBg)
+                    .border(1.dp, BorderDark)
+                    .clickable {
+                        if (line == "Start capture" || line == "Stop capture") onStartStop()
+                    }
+                    .padding(horizontal = 6.dp, vertical = 7.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PacketTable(
+    packets: List<PacketEntity>,
+    selected: PacketEntity?,
+    onSelect: (PacketEntity) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.background(DarkBg)) {
+        PacketHeader()
+        LazyColumn(modifier = Modifier.fillMaxSize().testTag("packet_table")) {
+            items(packets) { packet ->
+                PacketTableRow(
+                    packet = packet,
+                    selected = packet == selected,
+                    ordinal = packets.indexOf(packet) + 1,
+                    onClick = { onSelect(packet) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PacketHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .border(1.dp, if (packet.isSuspicious) CyberRed.copy(alpha = 0.3f) else Color.Transparent, RoundedCornerShape(8.dp))
-            .background(if (packet.isSuspicious) CyberRed.copy(alpha = 0.05f) else Color.Transparent)
-            .padding(vertical = 6.dp, horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .height(24.dp)
+            .background(DarkSurfaceElevated)
+            .border(1.dp, BorderDark)
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Timestamp
-        Text(
-            text = packet.timestampStr,
-            fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace,
-            color = CyberPrimary,
-            modifier = Modifier.width(52.dp)
-        )
+        HeaderText("No.", Modifier.width(38.dp))
+        HeaderText("Time", Modifier.width(58.dp))
+        HeaderText("Source", Modifier.weight(1.2f))
+        HeaderText("Destination", Modifier.weight(1.2f))
+        HeaderText("Protocol", Modifier.width(58.dp))
+        HeaderText("Length", Modifier.width(48.dp))
+        HeaderText("Info", Modifier.weight(1.6f))
+    }
+}
 
-        // Protocol Badge
-        Box(
-            modifier = Modifier
-                .width(42.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(highlightColor.copy(alpha = 0.2f))
-                .padding(vertical = 2.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = packet.protocol,
-                fontSize = 9.sp,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                color = highlightColor
-            )
+@Composable
+private fun PacketTableRow(
+    packet: PacketEntity,
+    selected: Boolean,
+    ordinal: Int,
+    onClick: () -> Unit
+) {
+    val bg = if (selected) CyberPrimary else protocolRowColor(packet)
+    val text = if (selected) TextWhite else Color(0xFF101318)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(27.dp)
+            .background(bg)
+            .border(1.dp, BorderDark.copy(alpha = 0.55f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        DataText(ordinal.toString(), Modifier.width(38.dp), text, alignEnd = true)
+        DataText(packet.timestampStr, Modifier.width(58.dp), text)
+        DataText(packet.sourceIp, Modifier.weight(1.2f), text)
+        DataText(packet.destIp, Modifier.weight(1.2f), text)
+        DataText(packet.protocol.uppercase(), Modifier.width(58.dp), text, bold = true)
+        DataText(packet.length.toString(), Modifier.width(48.dp), text, alignEnd = true)
+        DataText(packet.summary, Modifier.weight(1.6f), text)
+    }
+}
+
+@Composable
+private fun PacketDetailPanel(packet: PacketEntity?, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(DarkSurface)
+            .border(1.dp, BorderDark)
+    ) {
+        PanelTitle("Packet Details")
+        if (packet == null) {
+            EmptyPanelText("Select a packet row to inspect decoded fields.")
+            return
         }
-
-        // Host Mapping and Summary
-        Column(modifier = Modifier.weight(1f)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(decodedTree(packet)) { line ->
                 Text(
-                    text = packet.sourceIp,
+                    text = line,
+                    color = if (line.startsWith(">")) CyberPrimary else TextWhite,
                     fontSize = 10.sp,
                     fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    color = TextWhite,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "->",
-                    fontSize = 10.sp,
-                    color = TextGray
-                )
-                Text(
-                    text = packet.destIp,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    color = TextWhite,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(22.dp)
+                        .border(1.dp, BorderDark.copy(alpha = 0.5f))
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
                 )
             }
-            Text(
-                text = packet.summary,
-                fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace,
-                color = if (packet.isSuspicious) CyberRed else TextGray,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
         }
+    }
+}
 
-        if (packet.isSuspicious) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = "Threat Alert Detected",
-                tint = CyberRed,
-                modifier = Modifier.size(14.dp)
-            )
+@Composable
+private fun PacketBytesPanel(packet: PacketEntity?, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(DarkBg)
+            .border(1.dp, BorderDark)
+    ) {
+        PanelTitle("Packet Bytes")
+        if (packet == null) {
+            EmptyPanelText("Raw hex and ASCII dump appears here.")
+            return
         }
+        Text(
+            text = buildHexDump(packet),
+            color = TextWhite,
+            fontSize = 9.sp,
+            lineHeight = 12.sp,
+            fontFamily = FontFamily.Monospace,
+            modifier = Modifier
+                .fillMaxSize()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 6.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
+private fun PanelTitle(text: String) {
+    Text(
+        text = text,
+        color = TextGray,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(24.dp)
+            .background(DarkSurfaceElevated)
+            .border(1.dp, BorderDark)
+            .padding(horizontal = 6.dp, vertical = 5.dp)
+    )
+}
+
+@Composable
+private fun EmptyPanelText(text: String) {
+    Text(
+        text = text,
+        color = TextGray,
+        fontSize = 10.sp,
+        fontFamily = FontFamily.Monospace,
+        modifier = Modifier.padding(8.dp)
+    )
+}
+
+@Composable
+private fun HeaderText(text: String, modifier: Modifier) {
+    Text(
+        text = text,
+        color = TextGray,
+        fontSize = 9.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun DataText(
+    text: String,
+    modifier: Modifier,
+    color: Color,
+    bold: Boolean = false,
+    alignEnd: Boolean = false
+) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = 9.sp,
+        fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
+        fontFamily = FontFamily.Monospace,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
+        textAlign = if (alignEnd) androidx.compose.ui.text.style.TextAlign.End else androidx.compose.ui.text.style.TextAlign.Start
+    )
+}
+
+@Composable
+private fun RectTextButton(
+    text: String,
+    onClick: () -> Unit,
+    width: androidx.compose.ui.unit.Dp? = null,
+    active: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val base = if (width != null) modifier.width(width) else modifier
+    Text(
+        text = text,
+        color = if (active) DarkBg else TextWhite,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = base
+            .height(26.dp)
+            .background(if (active) CyberPrimary else DarkSurface)
+            .border(1.dp, if (active) CyberPrimary else BorderDark)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 6.dp, vertical = 6.dp)
+    )
+}
+
+private fun protocolRowColor(packet: PacketEntity): Color {
+    if (packet.isSuspicious || packet.tcpFlags.contains("RST", ignoreCase = true)) return Color(0xFFFFC7C7)
+    if (packet.tcpFlags.contains("SYN", ignoreCase = true)) return Color(0xFFCFF5CF)
+    return when (packet.protocol.uppercase()) {
+        "TCP" -> Color(0xFFE5D8F3)
+        "UDP", "DNS" -> Color(0xFFD6E9FF)
+        "HTTP" -> Color(0xFFD8F0D2)
+        "ARP" -> Color(0xFFFFF3C5)
+        "ICMP" -> Color(0xFFD7FAFF)
+        "TLS", "QUIC" -> Color(0xFFDDE5EF)
+        "SMB" -> Color(0xFFEBD8C8)
+        else -> Color(0xFFE1E3E8)
     }
 }
 
 private fun packetMatchesQuery(packet: PacketEntity, query: String): Boolean {
     val trimmed = query.trim()
     if (trimmed.isEmpty()) return true
-
     return trimmed.split(Regex("\\s+")).all { token ->
         val lower = token.lowercase()
         when {
             lower == "alert" || lower == "suspicious" -> packet.isSuspicious
             lower == "scan" -> packet.scanSignal.isNotBlank() || packet.heuristicClass.contains("scan", ignoreCase = true)
+            lower in listOf("tcp", "udp", "dns", "http", "arp", "tls", "icmp") -> packet.protocol.equals(lower, ignoreCase = true)
             lower.startsWith("proto=") -> packet.protocol.equals(lower.substringAfter("="), ignoreCase = true)
+            lower.startsWith("ip.src") || lower.startsWith("src=") -> packet.sourceIp.contains(lower.substringAfterLast("=").trim())
+            lower.startsWith("ip.dst") || lower.startsWith("dst=") -> packet.destIp.contains(lower.substringAfterLast("=").trim())
             lower.startsWith("ip=") -> {
                 val value = lower.substringAfter("=")
-                packet.sourceIp.lowercase().contains(value) || packet.destIp.lowercase().contains(value)
+                packet.sourceIp.contains(value) || packet.destIp.contains(value)
             }
-            lower.startsWith("src=") -> packet.sourceIp.lowercase().contains(lower.substringAfter("="))
-            lower.startsWith("dst=") -> packet.destIp.lowercase().contains(lower.substringAfter("="))
-            lower.startsWith("port=") -> {
-                val value = lower.substringAfter("=").toIntOrNull()
+            lower.startsWith("tcp.port") || lower.startsWith("udp.port") || lower.startsWith("port=") -> {
+                val value = lower.substringAfterLast("=").trim().toIntOrNull()
                 value != null && (packet.sourcePort == value || packet.destPort == value)
             }
-            lower.startsWith("len>") -> packet.length > (lower.substringAfter(">").toIntOrNull() ?: Int.MAX_VALUE)
-            lower.startsWith("len<") -> packet.length < (lower.substringAfter("<").toIntOrNull() ?: Int.MIN_VALUE)
-            lower.startsWith("entropy>") -> packet.entropy > (lower.substringAfter(">").toDoubleOrNull() ?: Double.MAX_VALUE)
-            else -> {
-                val haystack = listOf(
-                    packet.protocol,
-                    packet.sourceIp,
-                    packet.destIp,
-                    packet.summary,
-                    packet.payloadAscii,
-                    packet.payloadHex,
-                    packet.headerSummary,
-                    packet.tcpFlags,
-                    packet.heuristicClass,
-                    packet.alertMessage.orEmpty(),
-                    packet.scanSignal
-                ).joinToString(" ").lowercase()
-                haystack.contains(lower)
-            }
+            else -> listOf(
+                packet.protocol,
+                packet.sourceIp,
+                packet.destIp,
+                packet.summary,
+                packet.payloadAscii,
+                packet.payloadHex,
+                packet.headerSummary,
+                packet.tcpFlags,
+                packet.heuristicClass,
+                packet.alertMessage.orEmpty(),
+                packet.scanSignal
+            ).joinToString(" ").lowercase().contains(lower)
         }
     }
 }
 
-@Composable
-fun PacketInspectorDialog(
-    packet: PacketEntity,
-    viewModel: WireRifterViewModel,
-    onDismiss: () -> Unit
-) {
-    val isAnalyzing by viewModel.isLocalAnalysisRunning.collectAsState()
-    val aiResult by viewModel.packetAnalysisResult.collectAsState()
-
-    Dialog(onDismissRequest = onDismiss) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.85f)
-                .clip(RoundedCornerShape(24.dp))
-                .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(24.dp))
-                .padding(20.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Header
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = CyberPrimary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            text = "Frame Inspector",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextWhite
-                        )
-                    }
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close frame inspector",
-                            tint = TextGray
-                        )
-                    }
-                }
-
-                // Scrollable specifications
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    if (packet.isSuspicious) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color(0xFF31111D))
-                                .border(1.dp, Color(0xFF93000A), RoundedCornerShape(12.dp))
-                                .padding(12.dp)
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.Top
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Security,
-                                    contentDescription = null,
-                                    tint = Color(0xFFF2B8B5)
-                                )
-                                Column {
-                                    Text(
-                                        text = "IDS INTRUSION DETECTED",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 11.sp,
-                                        color = Color(0xFFF2B8B5),
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                    Text(
-                                        text = packet.alertMessage ?: "Unknown custom match alert rule triggered.",
-                                        fontSize = 10.sp,
-                                        color = Color(0xFFF2B8B5),
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Network info tables
-                    InfoPropertyRow("Timestamp", packet.timestampStr)
-                    InfoPropertyRow("Protocol Type", packet.protocol)
-                    InfoPropertyRow("Source Host Address", "${packet.sourceIp}:${packet.sourcePort ?: "unassigned"}")
-                    InfoPropertyRow("Destination Host Address", "${packet.destIp}:${packet.destPort ?: "unassigned"}")
-                    InfoPropertyRow("Wire Payload Length", "${packet.length} bytes")
-                    InfoPropertyRow("Transaction Statement", packet.summary)
-                    if (packet.headerSummary.isNotBlank()) {
-                        InfoPropertyRow("Decoded Header", packet.headerSummary)
-                    }
-                    if (packet.tcpFlags.isNotBlank()) {
-                        InfoPropertyRow("TCP Flags", packet.tcpFlags)
-                    }
-                    if (packet.scanSignal.isNotBlank()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color(0xFF31111D))
-                                .border(1.dp, Color(0xFF93000A), RoundedCornerShape(12.dp))
-                                .padding(12.dp)
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text(
-                                    text = "NETWORK SCAN SENSE",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFF2B8B5),
-                                    fontFamily = FontFamily.Monospace
-                                )
-                                Text(
-                                    text = packet.scanSignal,
-                                    fontSize = 10.sp,
-                                    color = Color(0xFFF2B8B5)
-                                )
-                            }
-                        }
-                    }
-
-                    // Native Advanced Insights and Shannon Entropy Bar
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(DarkBg)
-                            .padding(10.dp)
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "NATIVE HEURISTICS",
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = CyberPrimary,
-                                    letterSpacing = 0.5.sp
-                                )
-                                Text(
-                                    text = packet.heuristicClass.uppercase(),
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (packet.isSuspicious) CyberRed else CyberGreen,
-                                    fontFamily = FontFamily.Monospace
-                                )
-                            }
-                            
-                            Divider(thickness = 0.5.dp, color = BorderDark)
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "SHANNON ENTROPY",
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = CyberPrimary,
-                                    letterSpacing = 0.5.sp
-                                )
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text(
-                                        text = String.format("%.4f H", packet.entropy),
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextWhite,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                    Text(
-                                        text = packet.densityClassification,
-                                        fontSize = 8.sp,
-                                        color = TextGray
-                                    )
-                                }
-                            }
-                            
-                            // Visual Shannon Entropy Bar
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp))
-                                    .background(Color(0xFF222222))
-                            ) {
-                                val fractionalWidth = (packet.entropy / 8.0).coerceIn(0.0, 1.0).toFloat()
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .fillMaxWidth(fractionalWidth)
-                                        .background(
-                                            Brush.horizontalGradient(
-                                                listOf(CyberGreen, CyberPrimary, CyberRed)
-                                            )
-                                        )
-                                )
-                            }
-                        }
-                    }
-
-                    // Hex Dump view
-                    if (packet.rawPacketHex.isNotBlank()) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = "FULL RAW FRAME HEX",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = CyberPrimary,
-                                letterSpacing = 0.5.sp
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(DarkBg)
-                                    .padding(8.dp)
-                            ) {
-                                Text(
-                                    text = packet.rawPacketHex,
-                                    fontSize = 9.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                    color = CyberCyan,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    }
-
-                    // Hex Dump view
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text = "HEXADECIMAL DUMP",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = CyberPrimary,
-                            letterSpacing = 0.5.sp
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(DarkBg)
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = packet.payloadHex,
-                                fontSize = 10.sp,
-                                fontFamily = FontFamily.Monospace,
-                                color = CyberGreen,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-                    // ASCII Decoded view
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text = "RAW DECODED ASCII CONTENT",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = CyberPrimary,
-                            letterSpacing = 0.5.sp
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(DarkBg)
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = packet.payloadAscii,
-                                fontSize = 10.sp,
-                                fontFamily = FontFamily.Monospace,
-                                color = TextWhite,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-                    // --- 6. Local Forensic Panel ---
-                    Divider(color = BorderDark, thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Icon(
-                                imageVector = Icons.Outlined.Analytics,
-                                contentDescription = null,
-                                tint = CyberTertiary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Text(
-                                text = "Local Forensic Analyzer",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextWhite
-                            )
-                        }
-                        
-                        Button(
-                            onClick = { viewModel.runLocalPacketForensics(packet) },
-                            colors = ButtonDefaults.buttonColors(containerColor = CyberTertiary),
-                            shape = RoundedCornerShape(8.dp),
-                            enabled = !isAnalyzing,
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                            modifier = Modifier.height(32.dp).testTag("action_gpt_analyze")
-                        ) {
-                            if (isAnalyzing) {
-                                CircularProgressIndicator(color = DarkBg, modifier = Modifier.size(14.dp), strokeWidth = 1.5.dp)
-                            } else {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(12.dp))
-                                    Text("Run Forensics", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-                    }
-
-                    if (isAnalyzing) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                CircularProgressIndicator(color = CyberTertiary, strokeWidth = 2.dp)
-                                Text("Parsing hex payload offsets...", color = TextGray, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                            }
-                        }
-                    }
-
-                    aiResult?.let { text ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(DarkSurfaceElevated)
-                                .border(1.dp, BorderHighlight, RoundedCornerShape(12.dp))
-                                .padding(12.dp)
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(imageVector = Icons.Default.Analytics, contentDescription = null, tint = CyberTertiary, modifier = Modifier.size(14.dp))
-                                    Text("FORENSIC REPORT SIGNAL", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = CyberTertiary, fontFamily = FontFamily.Monospace)
-                                }
-                                Text(
-                                    text = text,
-                                    fontSize = 11.sp,
-                                    color = TextWhite,
-                                    lineHeight = 16.sp
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+private fun decodedTree(packet: PacketEntity): List<String> {
+    val frame = listOf(
+        "> Frame ${packet.id}: ${packet.length} bytes captured",
+        "  Arrival Time: ${packet.timestampStr}",
+        "  Protocol: ${packet.protocol}",
+        "  Capture Length: ${packet.length}"
+    )
+    val ip = listOf(
+        "> Internet Protocol, Src: ${packet.sourceIp}, Dst: ${packet.destIp}",
+        "  Source Address: ${packet.sourceIp}",
+        "  Destination Address: ${packet.destIp}",
+        "  Header: ${packet.headerSummary.ifBlank { "unavailable" }}"
+    )
+    val transport = listOf(
+        "> Transport, Src Port: ${packet.sourcePort ?: "-"}, Dst Port: ${packet.destPort ?: "-"}",
+        "  Source Port: ${packet.sourcePort ?: "-"}",
+        "  Destination Port: ${packet.destPort ?: "-"}",
+        "  Flags: ${packet.tcpFlags.ifBlank { "none" }}"
+    )
+    val app = listOf(
+        "> Application Data",
+        "  Summary: ${packet.summary}",
+        "  Entropy: ${String.format("%.4f", packet.entropy)}",
+        "  Class: ${packet.densityClassification}",
+        "  Signal: ${packet.scanSignal.ifBlank { packet.heuristicClass }}"
+    )
+    return frame + ip + transport + app
 }
 
-@Composable
-fun InfoPropertyRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = label, fontSize = 11.sp, color = TextGray, fontWeight = FontWeight.Bold)
-        Text(text = value, fontSize = 11.sp, color = TextWhite, fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
+private fun buildHexDump(packet: PacketEntity): String {
+    val source = packet.rawPacketHex.ifBlank { packet.payloadHex }
+    val bytes = source.split(Regex("\\s+"))
+        .mapNotNull { it.take(2).toIntOrNull(16)?.toByte() }
+        .ifEmpty { packet.payloadAscii.encodeToByteArray().toList() }
+    if (bytes.isEmpty()) return "No packet bytes available."
+
+    return bytes.chunked(16).mapIndexed { row, chunk ->
+        val offset = (row * 16).toString(16).padStart(4, '0')
+        val hex = chunk.joinToString(" ") { "%02x".format(it.toInt() and 0xFF) }.padEnd(47)
+        val ascii = chunk.joinToString("") { byte ->
+            val value = byte.toInt() and 0xFF
+            if (value in 32..126) value.toChar().toString() else "."
+        }
+        "$offset  $hex  $ascii"
+    }.joinToString("\n")
 }

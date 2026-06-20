@@ -81,9 +81,9 @@ fun AnalysisScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(20.dp))
+                .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                 .padding(16.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -114,7 +114,7 @@ fun AnalysisScreen(
                 Button(
                     onClick = { viewModel.runSubnetSecurityAudit() },
                     colors = ButtonDefaults.buttonColors(containerColor = CyberTertiary),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(0.dp),
                     enabled = !isAuditRunning,
                     modifier = Modifier.fillMaxWidth().testTag("compile_audit_btn")
                 ) {
@@ -138,9 +138,9 @@ fun AnalysisScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(DarkSurfaceElevated)
-                    .border(1.dp, BorderHighlight, RoundedCornerShape(20.dp))
+                    .border(1.dp, BorderHighlight, RoundedCornerShape(0.dp))
                     .padding(16.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -197,9 +197,9 @@ fun AnalysisScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(DarkSurface)
-                    .border(1.dp, BorderHighlight, RoundedCornerShape(16.dp))
+                    .border(1.dp, BorderHighlight, RoundedCornerShape(0.dp))
                     .padding(14.dp)
             ) {
                 RuleCreatorPanel(
@@ -244,9 +244,9 @@ fun RuleRow(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(0.dp))
             .background(DarkSurfaceElevated)
-            .border(1.dp, BorderDark, RoundedCornerShape(12.dp))
+            .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
             .padding(12.dp)
     ) {
         Row(
@@ -267,7 +267,7 @@ fun RuleRow(
 
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(0.dp))
                             .background(severityColor.copy(alpha = 0.15f))
                             .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
@@ -366,9 +366,9 @@ fun RuleCreatorPanel(
                     val isSel = selectedProtocol == pr
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(0.dp))
                             .background(if (isSel) CyberPrimary else DarkBg)
-                            .border(1.dp, if (isSel) CyberPrimary else BorderDark, RoundedCornerShape(8.dp))
+                            .border(1.dp, if (isSel) CyberPrimary else BorderDark, RoundedCornerShape(0.dp))
                             .clickable { selectedProtocol = pr }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
@@ -394,9 +394,9 @@ fun RuleCreatorPanel(
                     }
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(0.dp))
                             .background(if (isSel) itemCol else DarkBg)
-                            .border(1.dp, if (isSel) itemCol else BorderDark, RoundedCornerShape(8.dp))
+                            .border(1.dp, if (isSel) itemCol else BorderDark, RoundedCornerShape(0.dp))
                             .clickable { selectedSeverity = sv }
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
@@ -429,7 +429,7 @@ fun RuleCreatorPanel(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(0.dp),
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
                 modifier = Modifier.height(32.dp).testTag("save_rule_btn")
             ) {

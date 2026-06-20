@@ -125,9 +125,9 @@ fun StatisticsScreen(
 private fun StatTile(label: String, value: String, modifier: Modifier = Modifier, danger: Boolean = false) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(0.dp))
             .background(DarkSurface)
-            .border(1.dp, if (danger) CyberRed else BorderDark, RoundedCornerShape(16.dp))
+            .border(1.dp, if (danger) CyberRed else BorderDark, RoundedCornerShape(0.dp))
             .padding(14.dp)
     ) {
         Text(label.uppercase(), color = TextGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
@@ -140,9 +140,9 @@ private fun StatSection(title: String, content: @Composable ColumnScope.() -> Un
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(0.dp))
             .background(DarkSurface)
-            .border(1.dp, BorderDark, RoundedCornerShape(18.dp))
+            .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -155,7 +155,7 @@ private fun StatSection(title: String, content: @Composable ColumnScope.() -> Un
 private fun StatMeter(label: String, value: Int, max: Int) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         StatLine(label, value.toString())
-        Box(modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(DarkBg)) {
+        Box(modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(0.dp)).background(DarkBg)) {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()

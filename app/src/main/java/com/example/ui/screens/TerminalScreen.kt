@@ -72,9 +72,9 @@ fun TerminalScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(16.dp))
+                .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                 .padding(12.dp)
                 .testTag("terminal_output"),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -113,13 +113,13 @@ fun TerminalScreen(
                     focusedTextColor = TextWhite,
                     unfocusedTextColor = TextWhite
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(0.dp)
             )
 
             Button(
                 onClick = viewModel::submitTerminalCommand,
                 colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(0.dp),
                 modifier = Modifier
                     .height(54.dp)
                     .testTag("terminal_send")

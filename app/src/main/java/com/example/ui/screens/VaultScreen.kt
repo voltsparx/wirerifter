@@ -82,9 +82,9 @@ fun VaultScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(20.dp))
+                .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                 .padding(16.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -103,7 +103,7 @@ fun VaultScreen(
                 Button(
                     onClick = { viewModel.exportAllPacketsAsPcap() },
                     colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(0.dp),
                     modifier = Modifier.fillMaxWidth().testTag("export_all_pcap_btn")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -116,9 +116,9 @@ fun VaultScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(0.dp))
                             .background(DarkBg)
-                            .border(1.dp, BorderDark, RoundedCornerShape(10.dp))
+                            .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                             .padding(10.dp)
                     ) {
                         Text(
@@ -133,7 +133,7 @@ fun VaultScreen(
                 Button(
                     onClick = { showClearConfirmation = true },
                     colors = ButtonDefaults.buttonColors(containerColor = CyberRed),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(0.dp),
                     modifier = Modifier.fillMaxWidth().testTag("clear_vault_btn")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -149,9 +149,9 @@ fun VaultScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(20.dp))
+                .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                 .padding(16.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -212,9 +212,9 @@ fun VaultScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(Color(0xFF31111D))
-                    .border(1.dp, Color(0xFF93000A), RoundedCornerShape(14.dp))
+                    .border(1.dp, Color(0xFF93000A), RoundedCornerShape(0.dp))
                     .padding(12.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -284,7 +284,7 @@ fun VaultScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(80.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(0.dp))
                         .background(DarkSurface)
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
@@ -313,9 +313,9 @@ fun VaultScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(20.dp))
+                .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                 .padding(16.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -355,9 +355,9 @@ fun VaultScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(Color(0xFF2B1C10)) // Warm amber slate background
-                .border(1.5.dp, Color(0xFFE08D3C), RoundedCornerShape(20.dp)) // Cyber warning amber border
+                .border(1.5.dp, Color(0xFFE08D3C), RoundedCornerShape(0.dp)) // Cyber warning amber border
                 .padding(16.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -399,7 +399,7 @@ fun VaultScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(0.dp))
                         .background(DarkBg)
                         .padding(10.dp)
                 ) {
@@ -438,9 +438,9 @@ fun VaultScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurfaceElevated)
-                .border(2.dp, CyberPrimary.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                .border(2.dp, CyberPrimary.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
                 .padding(16.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -534,7 +534,7 @@ fun VaultScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(0.dp))
                         .background(DarkBg)
                         .clickable { /* Trigger external web repository */ }
                         .padding(10.dp)
@@ -617,9 +617,9 @@ private fun AppearanceChoice(
     Box(
         modifier = modifier
             .height(34.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(0.dp))
             .background(if (selected) CyberPrimary else DarkBg)
-            .border(1.dp, if (selected) CyberPrimary else BorderDark, RoundedCornerShape(10.dp))
+            .border(1.dp, if (selected) CyberPrimary else BorderDark, RoundedCornerShape(0.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -694,9 +694,9 @@ fun SessionRow(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(0.dp))
             .background(DarkSurfaceElevated)
-            .border(1.dp, BorderDark, RoundedCornerShape(16.dp))
+            .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
             .padding(14.dp)
     ) {
         Row(

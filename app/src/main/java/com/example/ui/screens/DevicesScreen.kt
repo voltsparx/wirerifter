@@ -9,7 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RectangleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -89,7 +89,7 @@ fun DevicesScreen(
                 onClick = { viewModel.triggerDeviceSubnetDiscovery() },
                 enabled = !isScanning,
                 colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(0.dp),
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                 modifier = Modifier.height(36.dp).testTag("device_scan_btn")
             ) {
@@ -111,9 +111,9 @@ fun DevicesScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurface)
-                .border(1.dp, BorderDark, RoundedCornerShape(20.dp))
+                .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                 .padding(12.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -148,7 +148,7 @@ fun DevicesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(42.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(0.dp))
                 .background(DarkSurfaceElevated)
                 .padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -157,7 +157,7 @@ fun DevicesScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(if (activeViewMode == "topology") CyberPrimary.copy(alpha = 0.18f) else Color.Transparent)
                     .clickable { activeViewMode = "topology" }
                     .testTag("toggle_topology_view"),
@@ -176,7 +176,7 @@ fun DevicesScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(if (activeViewMode == "list") CyberPrimary.copy(alpha = 0.18f) else Color.Transparent)
                     .clickable { activeViewMode = "list" }
                     .testTag("toggle_list_view"),
@@ -200,9 +200,9 @@ fun DevicesScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp)
-                    .clip(RoundedCornerShape(14.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(Color(0xFF31111D))
-                    .border(1.dp, Color(0xFF93000A), RoundedCornerShape(14.dp))
+                    .border(1.dp, Color(0xFF93000A), RoundedCornerShape(0.dp))
                     .padding(10.dp)
             ) {
                 Row(
@@ -234,9 +234,9 @@ fun DevicesScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(DarkSurface)
-                    .border(1.dp, BorderDark, RoundedCornerShape(24.dp))
+                    .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                     .padding(12.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -274,9 +274,9 @@ fun DevicesScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(16.dp))
+                                    .clip(RoundedCornerShape(0.dp))
                                     .background(DarkSurfaceElevated)
-                                    .border(1.dp, if (node.isTrusted) BorderDark else CyberRed, RoundedCornerShape(16.dp))
+                                    .border(1.dp, if (node.isTrusted) BorderDark else CyberRed, RoundedCornerShape(0.dp))
                                     .padding(12.dp)
                             ) {
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -289,7 +289,7 @@ fun DevicesScreen(
                                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                                 Text(node.hostname, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextWhite)
                                                 if (isOwnAgent) {
-                                                    Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(CyberPrimary.copy(alpha = 0.2f)).padding(horizontal = 4.dp)) {
+                                                    Box(modifier = Modifier.clip(RoundedCornerShape(0.dp)).background(CyberPrimary.copy(alpha = 0.2f)).padding(horizontal = 4.dp)) {
                                                         Text("SELF", fontSize = 8.sp, color = CyberPrimary, fontWeight = FontWeight.Bold)
                                                     }
                                                 }
@@ -352,7 +352,7 @@ fun DevicesScreen(
                                                 )
                                             },
                                             colors = ButtonDefaults.buttonColors(containerColor = if (node.isTrusted) CyberRed else CyberGreen),
-                                            shape = RoundedCornerShape(8.dp),
+                                            shape = RoundedCornerShape(0.dp),
                                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -374,9 +374,9 @@ fun DevicesScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(DarkSurface)
-                    .border(1.dp, BorderDark, RoundedCornerShape(24.dp))
+                    .border(1.dp, BorderDark, RoundedCornerShape(0.dp))
                     .padding(14.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -495,9 +495,9 @@ fun NetworkTopologyMap(
             modifier = Modifier
                 .offset(x = gatewayX, y = gatewayY)
                 .size(48.dp)
-                .clip(CircleShape)
+                .clip(RectangleShape)
                 .background(Brush.radialGradient(listOf(CyberPrimary.copy(alpha = 0.35f), DarkBg)))
-                .border(2.dp, CyberPrimary, CircleShape)
+                .border(2.dp, CyberPrimary, RectangleShape)
                 .clickable { onDeviceSelect(gatewayNode) }
                 .testTag("node_gateway"),
             contentAlignment = Alignment.Center
@@ -527,12 +527,12 @@ fun NetworkTopologyMap(
                 modifier = Modifier
                     .offset(x = nodeX, y = nodeY)
                     .size(40.dp)
-                    .clip(CircleShape)
+                    .clip(RectangleShape)
                     .background(DarkSurfaceElevated)
                     .border(
                         if (isSelected) 2.5.dp else 1.2.dp,
                         if (isSelected) CyberCyan else statusColor,
-                        CircleShape
+                        RectangleShape
                     )
                     .clickable { onDeviceSelect(client) }
                     .testTag("node_client_${idx}"),
@@ -553,9 +553,9 @@ fun NetworkTopologyMap(
                 Box(
                     modifier = Modifier
                         .offset(y = 22.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(0.dp))
                         .background(DarkBg.copy(alpha = 0.85f))
-                        .border(0.5.dp, statusColor.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                        .border(0.5.dp, statusColor.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
                         .padding(horizontal = 4.dp, vertical = 1.dp)
                 ) {
                     Text(
@@ -581,9 +581,9 @@ fun DeviceRow(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, BorderDark, RoundedCornerShape(14.dp)),
+            .border(1.dp, BorderDark, RoundedCornerShape(0.dp)),
         colors = CardDefaults.cardColors(containerColor = DarkSurfaceElevated),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(0.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
@@ -596,9 +596,9 @@ fun DeviceRow(
                 Box(
                     modifier = Modifier
                         .size(42.dp)
-                        .clip(CircleShape)
+                        .clip(RectangleShape)
                         .background(statusColor.copy(alpha = 0.1f))
-                        .border(1.dp, statusColor.copy(alpha = 0.2f), CircleShape),
+                        .border(1.dp, statusColor.copy(alpha = 0.2f), RectangleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -633,7 +633,7 @@ fun DeviceRow(
                         if (isOwnAgent) {
                             Box(
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
+                                    .clip(RoundedCornerShape(0.dp))
                                     .background(CyberPrimary.copy(alpha = 0.15f))
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             ) {
@@ -684,7 +684,7 @@ fun DeviceRow(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(0.dp))
                     .background(DarkBg)
                     .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -722,7 +722,7 @@ fun DeviceRow(
                     if (!isOwnAgent && !device.isGateway) {
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
+                                .clip(RoundedCornerShape(0.dp))
                                 .background(if (!device.isTrusted) CyberGreen.copy(alpha = 0.15f) else CyberRed.copy(alpha = 0.15f))
                                 .clickable { onTrustToggle() }
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
