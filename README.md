@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/voltsparx/wirerifter/refs/heads/main/docs/assets/images/wirerifter-logo-text-(no-bg).png?token=GHSAT0AAAAAADY3CYOWQGWCLM5DXVOWYKL42RWHOTQ" width="600">
+    <img src="https://raw.githubusercontent.com/voltsparx/wirerifter/refs/heads/main/docs/assets/images/wirerifter-logo-text-(no-bg).png?token=GHSAT0AAAAAADY3CYOXZYFPU2JDZQ26ABYU2RWHWAA" width="300">
 </p>
 
 
