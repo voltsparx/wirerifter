@@ -5,7 +5,7 @@
 ![Platform](https://img.shields.io/badge/platform-Android-617fd0)
 ![Core](https://img.shields.io/badge/core-Kotlin%20%2B%20Rust-617fd0)
 ![Storage](https://img.shields.io/badge/storage-Room%20%2B%20PCAP-617fd0)
-![License](https://img.shields.io/badge/license-WireRifter%20Attribution%201.0-617fd0)
+![License](https://img.shields.io/badge/license-Proprietary%20Source--Available-617fd0)
 
 WireRifter is an Android security research app built for people who need to understand what is happening on a local network from a mobile device. It combines a Kotlin/Jetpack Compose interface with a Rust-powered analysis layer, local persistence, packet inspection, PCAP export, host inventory, OS fingerprinting, and scan-sense alerting.
 
@@ -179,6 +179,8 @@ WireRifter is an active security research project. Some capture paths depend on 
 
 ## License
 
-WireRifter is released under the **WireRifter Open Attribution License 1.0**. You may use, study, modify, build, and redistribute the source, but attribution is mandatory and modified versions must clearly preserve credit and identify changes.
+WireRifter is proprietary, source-available software. Personal, educational, and internal authorized security use is permitted, but modification, redistribution, commercial use, rebranding, sublicensing, or publication of derivative works requires prior written permission from voltsparx.
+
+Attribution and copyright notices must remain intact in every permitted use.
 
 See [LICENSE](LICENSE) for the full terms.
