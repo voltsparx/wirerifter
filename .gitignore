@@ -16,7 +16,7 @@
 local.properties
 .env
 debug.keystore
-*.vscode
+.vscode
 
 *.py
 *.bin
