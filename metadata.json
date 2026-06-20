@@ -1,0 +1,6 @@
+{
+  "name": "WireRifter",
+  "description": "Cybersecurity software for local Wi-Fi packet sniffing, rogue-device scanning, and network protocol inspection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [""]
+}
