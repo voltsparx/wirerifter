@@ -413,7 +413,7 @@ fun VaultScreen(
                         )
                         Text(
                             text = "- 100% client-side scan pipeline: no servers, zero telemetry callbacks.\n" +
-                                   "- Fully open-source repository: run compilation directly from source.\n" +
+                                   "- Source-available repository: run compilation directly from source.\n" +
                                    "- No Internet broadcast threads: operates with total secure air-gap isolation.\n" +
                                    "- Local capture: executed on local network loops.",
                             fontSize = 9.sp,
@@ -434,7 +434,7 @@ fun VaultScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // --- 5. Open Source Credits & Developer Profile ---
+        // --- 5. Project Credits & Developer Profile ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -455,7 +455,7 @@ fun VaultScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = "Open Source Integration Credits",
+                        text = "Project Credits & License Notice",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextWhite
@@ -463,7 +463,7 @@ fun VaultScreen(
                 }
 
                 Text(
-                    text = "This application is fully registered as an open-source security intelligence project. All packet-sniffing parsing algorithms, digital threat filters, heuristics models, and Shannon Entropy estimators operate purely client-side without collecting user telemetry.",
+                    text = "This application is proprietary, source-available security software. Personal, educational, and internal authorized use is permitted while attribution and license notices remain intact.",
                     fontSize = 10.sp,
                     color = TextGray,
                     lineHeight = 14.sp
