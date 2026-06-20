@@ -89,6 +89,11 @@ object PacketAnalyzerJni {
         val densityClassification: String = "Plain-Text Stream",
         val anomalyDetected: Boolean = false,
         val heuristicClass: String = "Normal State",
+        val riskScore: Int = 0,
+        val scanSignals: List<String> = emptyList(),
+        val parseWarnings: List<String> = emptyList(),
+        val flowId: String = "",
+        val tcpFlags: String? = null,
         val rawJson: String = ""
     )
 
@@ -101,6 +106,9 @@ object PacketAnalyzerJni {
             val dense = obj.optString("density_classification", "Plain-Text Stream")
             val anomaly = obj.optBoolean("anomaly_detected", false)
             val heurClass = obj.optString("heuristic_class", "Normal State")
+            val riskScore = obj.optInt("risk_score", if (susp) 75 else 0)
+            val flowId = obj.optString("flow_id", "")
+            val tcpFlags = obj.optString("tcp_flags", "").ifBlank { null }
             
             val leaksArr = obj.optJSONArray("leaks_found")
             val flags = mutableListOf<String>()
@@ -112,6 +120,9 @@ object PacketAnalyzerJni {
             if (anomaly) {
                 flags.add("HEURISTIC_ANOMALY")
             }
+            val scanSignals = readJsonStringArray(obj, "scan_signals")
+            val parseWarnings = readJsonStringArray(obj, "parse_warnings")
+            flags.addAll(scanSignals)
 
             PacketAnalysisResult(
                 suspicious = susp,
@@ -121,6 +132,11 @@ object PacketAnalyzerJni {
                 densityClassification = dense,
                 anomalyDetected = anomaly,
                 heuristicClass = heurClass,
+                riskScore = riskScore,
+                scanSignals = scanSignals,
+                parseWarnings = parseWarnings,
+                flowId = flowId,
+                tcpFlags = tcpFlags,
                 rawJson = json
             )
         } catch (e: Exception) {
@@ -128,6 +144,15 @@ object PacketAnalyzerJni {
             val susp = json.contains("\"suspicious\":true") || json.contains("\"suspicious\": true")
             val proto = if (json.contains("HTTP")) "HTTP" else if (json.contains("DNS")) "DNS" else "RAW"
             PacketAnalysisResult(suspicious = susp, protocol = proto, rawJson = json)
+        }
+    }
+
+    private fun readJsonStringArray(obj: JSONObject, name: String): List<String> {
+        val array = obj.optJSONArray(name) ?: return emptyList()
+        return buildList {
+            for (i in 0 until array.length()) {
+                array.optString(i).takeIf { it.isNotBlank() }?.let(::add)
+            }
         }
     }
 
@@ -231,6 +256,9 @@ object PacketAnalyzerJni {
                "density_classification": "$densityClass",
                "anomaly_detected": $hasAnomaly,
                "heuristic_class": "$hClass",
+               "risk_score": ${if (isSusp) 75 else 0},
+               "scan_signals": [],
+               "parse_warnings": [],
                "length": ${payload.size}
             }
         """.trimIndent()
@@ -243,6 +271,7 @@ object PacketAnalyzerJni {
             densityClassification = densityClass,
             anomalyDetected = hasAnomaly,
             heuristicClass = hClass,
+            riskScore = if (isSusp) 75 else 0,
             rawJson = fallbackJson
         )
     }
