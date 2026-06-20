@@ -1,9 +1,4 @@
-<p align="center">
-    <img src="docs/assets/images/wirerifter-logo-text-(no-bg).png" width="300">
-</p>
-
-
-# WireRifter
+# <img src="docs/assets/images/wirerifter-logo-text-(no-bg).png" width="200" valign="middle" alt="WireRifter" />&nbsp;&nbsp; WireRifter
 
 > Defensive mobile network inspection, packet capture, local analysis, and device fingerprinting for Android.
 
@@ -15,6 +10,8 @@
 WireRifter is an Android security research app built for people who need to understand what is happening on a local network from a mobile device. It combines a Kotlin/Jetpack Compose interface with a Rust-powered analysis layer, local persistence, packet inspection, PCAP export, host inventory, OS fingerprinting, and scan-sense alerting.
 
 It is designed for authorized network visibility, defensive investigation, lab work, mobile-first cybersecurity research, and analyst workflows where the device should explain what it sees instead of hiding the raw details.
+
+> I'm still working on it, it's still not that usable. I'm trying to fix the frontend!
 
 ## What It Does
 
