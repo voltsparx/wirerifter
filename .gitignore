@@ -1,26 +1,33 @@
-*.iml
-.gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# IDE / OS
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-.env
-debug.keystore
-.vscode
+*.iml
+.vscode/
+.idea/
 
-*.py
+# Local configuration and secrets
+.env
+local.properties
+debug.keystore
+my-upload-key.jks
+*.jks
+*.keystore
+
+# Gradle / Android build output
+.gradle/
+.kotlin/
+build/
+**/build/
+.externalNativeBuild/
+.cxx/
+captures/
+apk_test/
+
+# Rust build output
+target/
+**/target/
+
+# Local scratch files
 *.bin
 *.zip
-*.nim
 *.load
 self-assessment/

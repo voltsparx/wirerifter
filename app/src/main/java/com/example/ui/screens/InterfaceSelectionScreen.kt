@@ -60,7 +60,7 @@ fun InterfaceSelectionScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(34.dp),
+                .heightIn(min = 40.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -78,13 +78,17 @@ fun InterfaceSelectionScreen(
                 text = "Capture Interfaces",
                 color = TextWhite,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
             Text(
                 text = "$selectedCount selected",
                 color = CyberPrimary,
                 fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1
             )
         }
 
@@ -110,7 +114,7 @@ fun InterfaceSelectionScreen(
             shape = RectangleShape,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(44.dp)
+                .height(48.dp)
                 .padding(top = 6.dp)
         ) {
             Icon(Icons.Default.PlayArrow, contentDescription = null, tint = DarkBg, modifier = Modifier.size(18.dp))
@@ -147,6 +151,7 @@ private fun HeaderCell(text: String, modifier: Modifier) {
         fontSize = 9.sp,
         fontWeight = FontWeight.Bold,
         maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier
     )
 }
@@ -161,7 +166,7 @@ private fun InterfaceRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(38.dp)
+                .heightIn(min = 44.dp)
                 .background(bg)
                 .clickable(onClick = onClick)
                 .padding(horizontal = 6.dp),

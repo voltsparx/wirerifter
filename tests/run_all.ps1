@@ -19,7 +19,17 @@ Set-Location $root
 
 Step "Repository hygiene"
 if (HasCommand "rg") {
-    $matches = rg -n "wireshark|Wireshark|nmap|Nmap|NetSentry|netsentry|Gemini|firebase" app/src/main README.md docs LICENSE metadata.json
+    $legacyNames = @(
+        "wire" + "shark",
+        "Wire" + "shark",
+        "n" + "map",
+        "N" + "map",
+        "Net" + "Sentry",
+        "net" + "sentry",
+        "Gem" + "ini",
+        "fire" + "base"
+    )
+    $matches = rg -n ($legacyNames -join "|") app/src/main README.md docs LICENSE metadata.json
     if ($LASTEXITCODE -eq 0) {
         Write-Host $matches
         throw "Repository hygiene scan found blocked legacy references."

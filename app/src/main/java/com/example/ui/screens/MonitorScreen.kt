@@ -8,14 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RectangleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -92,23 +91,25 @@ fun MonitorScreen(
                     .fillMaxWidth()
             )
 
-            Divider(thickness = 1.dp, color = CyberPrimary.copy(alpha = 0.65f))
+            selectedPacket?.let { packet ->
+                Divider(thickness = 1.dp, color = CyberPrimary.copy(alpha = 0.65f))
 
-            PacketDetailPanel(
-                packet = selectedPacket,
-                modifier = Modifier
-                    .weight(0.25f)
-                    .fillMaxWidth()
-            )
+                PacketDetailPanel(
+                    packet = packet,
+                    modifier = Modifier
+                        .weight(0.25f)
+                        .fillMaxWidth()
+                )
 
-            Divider(thickness = 1.dp, color = BorderDark)
+                Divider(thickness = 1.dp, color = BorderDark)
 
-            PacketBytesPanel(
-                packet = selectedPacket,
-                modifier = Modifier
-                    .weight(0.19f)
-                    .fillMaxWidth()
-            )
+                PacketBytesPanel(
+                    packet = packet,
+                    modifier = Modifier
+                        .weight(0.19f)
+                        .fillMaxWidth()
+                )
+            }
         }
 
         if (panelOpen) {
@@ -124,7 +125,8 @@ fun MonitorScreen(
                 onClose = { panelOpen = false },
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(318.dp)
+                    .fillMaxWidth(0.92f)
+                    .widthIn(max = 318.dp)
                     .align(Alignment.TopStart)
             )
         }
@@ -226,7 +228,9 @@ private fun SlidePanel(
                 color = TextWhite,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 6.dp)
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 6.dp).weight(1f)
             )
         }
         OutlinedTextField(
@@ -267,6 +271,7 @@ private fun SlidePanel(
                         .background(if (selected) CyberPrimary else DarkSurfaceElevated)
                         .border(1.dp, BorderDark)
                         .clickable { onPanelTabChange(tab) }
+                        .heightIn(min = 32.dp)
                         .padding(horizontal = 8.dp, vertical = 5.dp)
                 )
             }
@@ -299,9 +304,11 @@ private fun PanelTabContent(
                 color = TextWhite,
                 fontSize = 10.sp,
                 fontFamily = FontFamily.Monospace,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(28.dp)
+                    .heightIn(min = 32.dp)
                     .background(DarkBg)
                     .border(1.dp, BorderDark)
                     .clickable {
@@ -323,11 +330,11 @@ private fun PacketTable(
     Column(modifier = modifier.background(DarkBg)) {
         PacketHeader()
         LazyColumn(modifier = Modifier.fillMaxSize().testTag("packet_table")) {
-            items(packets) { packet ->
+            itemsIndexed(packets) { index, packet ->
                 PacketTableRow(
                     packet = packet,
                     selected = packet == selected,
-                    ordinal = packets.indexOf(packet) + 1,
+                    ordinal = index + 1,
                     onClick = { onSelect(packet) }
                 )
             }
@@ -368,7 +375,7 @@ private fun PacketTableRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(27.dp)
+            .heightIn(min = 32.dp)
             .background(bg)
             .border(1.dp, BorderDark.copy(alpha = 0.55f))
             .clickable(onClick = onClick)
@@ -477,6 +484,8 @@ private fun HeaderText(text: String, modifier: Modifier) {
         color = TextGray,
         fontSize = 9.sp,
         fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier
     )
 }
@@ -517,7 +526,7 @@ private fun RectTextButton(
         fontSize = 10.sp,
         fontWeight = FontWeight.Bold,
         modifier = base
-            .height(26.dp)
+            .heightIn(min = 32.dp)
             .background(if (active) CyberPrimary else DarkSurface)
             .border(1.dp, if (active) CyberPrimary else BorderDark)
             .clickable(onClick = onClick)

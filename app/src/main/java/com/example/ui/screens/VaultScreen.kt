@@ -61,19 +61,23 @@ fun VaultScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Archive Sandbox",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextWhite,
-                    letterSpacing = 0.sp
+                    letterSpacing = 0.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = "Historical Scans & Cybersecurity Reference",
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
-                    color = TextGray
+                    color = TextGray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -104,11 +108,11 @@ fun VaultScreen(
                     onClick = { viewModel.exportAllPacketsAsPcap() },
                     colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
                     shape = RoundedCornerShape(0.dp),
-                    modifier = Modifier.fillMaxWidth().testTag("export_all_pcap_btn")
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp).testTag("export_all_pcap_btn")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Icon(imageVector = Icons.Default.SaveAlt, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Text("Export Packet Archive (.pcap)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DarkBg)
+                        Text("Export Packet Archive (.pcap)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DarkBg, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
 
@@ -125,7 +129,9 @@ fun VaultScreen(
                             text = status,
                             fontSize = 9.sp,
                             color = if (status.startsWith("Saved")) CyberGreen else CyberRed,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = FontFamily.Monospace,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -134,11 +140,11 @@ fun VaultScreen(
                     onClick = { showClearConfirmation = true },
                     colors = ButtonDefaults.buttonColors(containerColor = CyberRed),
                     shape = RoundedCornerShape(0.dp),
-                    modifier = Modifier.fillMaxWidth().testTag("clear_vault_btn")
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp).testTag("clear_vault_btn")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Icon(imageVector = Icons.Default.DeleteForever, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Text("Purge DB and Run Warm Reset", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text("Purge DB and Run Warm Reset", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -223,7 +229,9 @@ fun VaultScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 11.sp,
                         color = Color(0xFFF2B8B5),
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = FontFamily.Monospace,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "This removes all saved PCAP summaries, IDS rules exceptions, and resets system metrics. Operation cannot be undone.",
@@ -242,7 +250,8 @@ fun VaultScreen(
                             color = Color(0xFFF2B8B5),
                             modifier = Modifier
                                 .clickable { showClearConfirmation = false }
-                                .padding(horizontal = 12.dp)
+                                .heightIn(min = 36.dp)
+                                .padding(horizontal = 12.dp, vertical = 9.dp)
                         )
                         Button(
                             onClick = {
@@ -250,9 +259,9 @@ fun VaultScreen(
                                 showClearConfirmation = false
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = CyberRed),
-                            modifier = Modifier.height(28.dp).testTag("confirm_purge_btn")
+                            modifier = Modifier.height(44.dp).testTag("confirm_purge_btn")
                         ) {
-                            Text("Purge Workspace", fontSize = 10.sp, color = TextWhite, fontWeight = FontWeight.Bold)
+                            Text("Purge Workspace", fontSize = 10.sp, color = TextWhite, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
@@ -384,7 +393,7 @@ fun VaultScreen(
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFE08D3C),
-                    letterSpacing = 0.5.sp,
+                    letterSpacing = 0.sp,
                     fontFamily = FontFamily.Monospace
                 )
 
@@ -616,7 +625,7 @@ private fun AppearanceChoice(
 ) {
     Box(
         modifier = modifier
-            .height(34.dp)
+            .height(44.dp)
             .clip(RoundedCornerShape(0.dp))
             .background(if (selected) CyberPrimary else DarkBg)
             .border(1.dp, if (selected) CyberPrimary else BorderDark, RoundedCornerShape(0.dp))
@@ -627,7 +636,9 @@ private fun AppearanceChoice(
             text = label,
             color = if (selected) DarkBg else TextWhite,
             fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -739,7 +750,7 @@ fun SessionRow(
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(
                     onClick = onExport,
-                    modifier = Modifier.size(32.dp).testTag("export_session_${session.sessionId.take(4)}")
+                    modifier = Modifier.size(40.dp).testTag("export_session_${session.sessionId.take(4)}")
                 ) {
                     Icon(
                         imageVector = Icons.Default.SaveAlt,
@@ -750,7 +761,7 @@ fun SessionRow(
                 }
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(32.dp).testTag("delete_session_${session.sessionId.take(4)}")
+                    modifier = Modifier.size(40.dp).testTag("delete_session_${session.sessionId.take(4)}")
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,

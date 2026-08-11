@@ -60,19 +60,23 @@ fun AnalysisScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Intrusion Analysis",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextWhite,
-                    letterSpacing = 0.sp
+                    letterSpacing = 0.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = "Heuristic Signature Engines & Local Audit",
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
-                    color = TextGray
+                    color = TextGray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -101,7 +105,9 @@ fun AnalysisScreen(
                         text = if (rogueCount == 0 && alertCount == 0) "SHIELD STATE: STABLE" else "SHIELD STATE: HEURISTICS WARNING",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (rogueCount == 0 && alertCount == 0) CyberGreen else CyberAmber
+                        color = if (rogueCount == 0 && alertCount == 0) CyberGreen else CyberAmber,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -116,16 +122,16 @@ fun AnalysisScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = CyberTertiary),
                     shape = RoundedCornerShape(0.dp),
                     enabled = !isAuditRunning,
-                    modifier = Modifier.fillMaxWidth().testTag("compile_audit_btn")
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp).testTag("compile_audit_btn")
                 ) {
                     if (isAuditRunning) {
                         CircularProgressIndicator(color = DarkBg, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Consolidating Wi-Fi Packets...", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("Consolidating Packets...", fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     } else {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(imageVector = Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text("Compile Local Security Audit", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Compile Local Security Audit", fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
@@ -149,7 +155,15 @@ fun AnalysisScreen(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Icon(imageVector = Icons.Default.Analytics, contentDescription = null, tint = CyberTertiary, modifier = Modifier.size(16.dp))
-                        Text("WireRifter INTELLIGENCE AUDIT", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = CyberTertiary, fontFamily = FontFamily.Monospace)
+                        Text(
+                            "WireRifter INTELLIGENCE AUDIT",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = CyberTertiary,
+                            fontFamily = FontFamily.Monospace,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                     Text(
                         text = text,
@@ -170,13 +184,19 @@ fun AnalysisScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.weight(1f)
+            ) {
                 Icon(imageVector = Icons.Outlined.BugReport, contentDescription = null, tint = CyberPrimary, modifier = Modifier.size(18.dp))
                 Text(
                     text = "IDS Signature Rules",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextWhite
+                    color = TextWhite,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -187,6 +207,8 @@ fun AnalysisScreen(
                 color = CyberPrimary,
                 modifier = Modifier
                     .clickable { showRuleCreator = !showRuleCreator }
+                    .heightIn(min = 36.dp)
+                    .padding(horizontal = 8.dp, vertical = 9.dp)
                     .testTag("toggle_rule_creator_btn")
             )
         }
@@ -262,7 +284,10 @@ fun RuleRow(
                         text = rule.name,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextWhite
+                        color = TextWhite,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
 
                     Box(
@@ -292,7 +317,7 @@ fun RuleRow(
 
             IconButton(
                 onClick = onDelete,
-                modifier = Modifier.size(24.dp).testTag("delete_rule_${rule.id}")
+                modifier = Modifier.size(40.dp).testTag("delete_rule_${rule.id}")
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
@@ -370,7 +395,8 @@ fun RuleCreatorPanel(
                             .background(if (isSel) CyberPrimary else DarkBg)
                             .border(1.dp, if (isSel) CyberPrimary else BorderDark, RoundedCornerShape(0.dp))
                             .clickable { selectedProtocol = pr }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .heightIn(min = 36.dp)
+                            .padding(horizontal = 8.dp, vertical = 9.dp)
                     ) {
                         Text(pr, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (isSel) DarkBg else TextWhite)
                     }
@@ -398,7 +424,8 @@ fun RuleCreatorPanel(
                             .background(if (isSel) itemCol else DarkBg)
                             .border(1.dp, if (isSel) itemCol else BorderDark, RoundedCornerShape(0.dp))
                             .clickable { selectedSeverity = sv }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .heightIn(min = 36.dp)
+                            .padding(horizontal = 8.dp, vertical = 9.dp)
                     ) {
                         Text(sv, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (isSel) DarkBg else TextWhite)
                     }
@@ -419,7 +446,8 @@ fun RuleCreatorPanel(
                 color = TextGray,
                 modifier = Modifier
                     .clickable(onClick = onCancel)
-                    .padding(horizontal = 12.dp)
+                    .heightIn(min = 36.dp)
+                    .padding(horizontal = 12.dp, vertical = 9.dp)
             )
 
             Button(
@@ -431,9 +459,9 @@ fun RuleCreatorPanel(
                 colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
                 shape = RoundedCornerShape(0.dp),
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
-                modifier = Modifier.height(32.dp).testTag("save_rule_btn")
+                modifier = Modifier.height(44.dp).testTag("save_rule_btn")
             ) {
-                Text("Save Directive", fontSize = 11.sp, color = DarkBg, fontWeight = FontWeight.Bold)
+                Text("Save Directive", fontSize = 11.sp, color = DarkBg, fontWeight = FontWeight.Bold, maxLines = 1)
             }
         }
     }

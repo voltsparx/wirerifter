@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -128,7 +129,7 @@ private fun CompactBottomNav(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(56.dp)
                 .clip(RectangleShape)
                 .background(DarkSurface),
             verticalAlignment = Alignment.CenterVertically
@@ -160,7 +161,8 @@ private fun NavCell(
             .fillMaxHeight()
             .clickable { onTabSelected(route) }
             .testTag(testTag),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
@@ -180,7 +182,9 @@ private fun NavCell(
             fontSize = 8.sp,
             fontWeight = FontWeight.Medium,
             color = if (selected) TextWhite else TextGray,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

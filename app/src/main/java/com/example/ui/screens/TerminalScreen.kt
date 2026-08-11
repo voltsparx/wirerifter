@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
@@ -60,9 +61,16 @@ fun TerminalScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text("Terminal", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = TextWhite)
-                Text("Local network commands and packet workflow helpers", fontSize = 11.sp, color = TextGray, fontFamily = FontFamily.Monospace)
+                Text(
+                    "Local network commands and packet workflow helpers",
+                    fontSize = 11.sp,
+                    color = TextGray,
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
             Icon(Icons.Default.Code, contentDescription = null, tint = CyberPrimary, modifier = Modifier.size(28.dp))
         }
@@ -122,6 +130,7 @@ fun TerminalScreen(
                 shape = RoundedCornerShape(0.dp),
                 modifier = Modifier
                     .height(54.dp)
+                    .widthIn(min = 52.dp)
                     .testTag("terminal_send")
             ) {
                 Icon(Icons.Default.Send, contentDescription = "Run command", tint = DarkBg, modifier = Modifier.size(18.dp))

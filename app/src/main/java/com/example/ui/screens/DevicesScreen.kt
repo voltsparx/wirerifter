@@ -69,19 +69,23 @@ fun DevicesScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Subnet Inventory",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextWhite,
-                    letterSpacing = 0.sp
+                    letterSpacing = 0.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = "Target Subnet: ${gatewayIp.substringBeforeLast(".")}.0 / 24",
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
-                    color = TextGray
+                    color = TextGray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -91,7 +95,7 @@ fun DevicesScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
                 shape = RoundedCornerShape(0.dp),
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
-                modifier = Modifier.height(36.dp).testTag("device_scan_btn")
+                modifier = Modifier.height(44.dp).testTag("device_scan_btn")
             ) {
                 if (isScanning) {
                     CircularProgressIndicator(color = DarkBg, modifier = Modifier.size(14.dp), strokeWidth = 1.5.dp)
@@ -101,7 +105,7 @@ fun DevicesScreen(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Text("Probe Subnet", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DarkBg)
+                        Text("Probe Subnet", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DarkBg, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -132,11 +136,11 @@ fun DevicesScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    NetworkParamLabel("Local IP", localIp)
-                    NetworkParamLabel("Gateway", gatewayIp)
-                    NetworkParamLabel("Rogue Indicators", "$rogueCount Threats")
+                    NetworkParamLabel("Local IP", localIp, Modifier.weight(1f))
+                    NetworkParamLabel("Gateway", gatewayIp, Modifier.weight(1f))
+                    NetworkParamLabel("Rogue Indicators", "$rogueCount Threats", Modifier.weight(1f))
                 }
             }
         }
@@ -168,7 +172,14 @@ fun DevicesScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Icon(imageVector = Icons.Outlined.Hub, contentDescription = null, tint = if (activeViewMode == "topology") CyberPrimary else TextGray, modifier = Modifier.size(16.dp))
-                    Text("Topology Map", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (activeViewMode == "topology") TextWhite else TextGray)
+                    Text(
+                        "Topology",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (activeViewMode == "topology") TextWhite else TextGray,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
@@ -187,7 +198,14 @@ fun DevicesScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Icon(imageVector = Icons.Outlined.List, contentDescription = null, tint = if (activeViewMode == "list") CyberPrimary else TextGray, modifier = Modifier.size(16.dp))
-                    Text("Node Inventory", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (activeViewMode == "list") TextWhite else TextGray)
+                    Text(
+                        "Inventory",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (activeViewMode == "list") TextWhite else TextGray,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }
@@ -216,12 +234,16 @@ fun DevicesScreen(
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp,
                             color = Color(0xFFF2B8B5),
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = FontFamily.Monospace,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = "Found $rogueCount node(s) marked untrusted. Tap node to isolate details.",
                             fontSize = 9.sp,
-                            color = Color(0xFFF2B8B5)
+                            color = Color(0xFFF2B8B5),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -246,6 +268,8 @@ fun DevicesScreen(
                         fontWeight = FontWeight.Bold,
                         color = TextWhite,
                         fontFamily = FontFamily.Monospace,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -285,19 +309,34 @@ fun DevicesScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Column {
+                                        Column(modifier = Modifier.weight(1f)) {
                                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                                Text(node.hostname, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextWhite)
+                                                Text(
+                                                    node.hostname,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = TextWhite,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier.weight(1f, fill = false)
+                                                )
                                                 if (isOwnAgent) {
                                                     Box(modifier = Modifier.clip(RoundedCornerShape(0.dp)).background(CyberPrimary.copy(alpha = 0.2f)).padding(horizontal = 4.dp)) {
                                                         Text("SELF", fontSize = 8.sp, color = CyberPrimary, fontWeight = FontWeight.Bold)
                                                     }
                                                 }
                                             }
-                                            Text("${node.ipAddress} - ${node.macAddress.uppercase()}", fontSize = 10.sp, color = TextGray, fontFamily = FontFamily.Monospace)
+                                            Text(
+                                                "${node.ipAddress} - ${node.macAddress.uppercase()}",
+                                                fontSize = 10.sp,
+                                                color = TextGray,
+                                                fontFamily = FontFamily.Monospace,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
                                         }
 
-                                        IconButton(onClick = { selectedDeviceFromTopology = null }, modifier = Modifier.size(24.dp)) {
+                                        IconButton(onClick = { selectedDeviceFromTopology = null }, modifier = Modifier.size(40.dp)) {
                                             Icon(imageVector = Icons.Default.Close, contentDescription = "Close details panel", tint = TextGray, modifier = Modifier.size(16.dp))
                                         }
                                     }
@@ -310,14 +349,21 @@ fun DevicesScreen(
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text("Vendor: ${node.vendor}", fontSize = 10.sp, color = TextGray)
-                                            Text("Trust State: ${if (node.isTrusted) "Trusted Node" else "POTENTIAL THREAT (UNTRUSTED)"}", fontSize = 10.sp, color = if (node.isTrusted) CyberGreen else CyberRed, fontWeight = FontWeight.Bold)
+                                            Text("Vendor: ${node.vendor}", fontSize = 10.sp, color = TextGray, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text(
+                                                "Trust State: ${if (node.isTrusted) "Trusted Node" else "Untrusted"}",
+                                                fontSize = 10.sp,
+                                                color = if (node.isTrusted) CyberGreen else CyberRed,
+                                                fontWeight = FontWeight.Bold,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
                                             
                                             Spacer(modifier = Modifier.height(6.dp))
-                                            Text("OS Fingerprint: ${node.osFingerprint}", fontSize = 9.sp, color = TextWhite, fontWeight = FontWeight.Medium)
-                                            Text("Device Type: ${node.deviceType}", fontSize = 9.sp, color = CyberCyan, fontWeight = FontWeight.SemiBold)
-                                            Text("Confidence: ${node.fingerprintConfidence}% | Care: ${node.careState}", fontSize = 8.sp, color = CyberPrimary, fontFamily = FontFamily.Monospace)
-                                            Text("Metric Signatures: ${node.ttlFingerprint}", fontSize = 8.sp, color = TextGray, fontFamily = FontFamily.Monospace)
+                                            Text("OS Fingerprint: ${node.osFingerprint}", fontSize = 9.sp, color = TextWhite, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text("Device Type: ${node.deviceType}", fontSize = 9.sp, color = CyberCyan, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text("Confidence: ${node.fingerprintConfidence}% | Care: ${node.careState}", fontSize = 8.sp, color = CyberPrimary, fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text("Metric Signatures: ${node.ttlFingerprint}", fontSize = 8.sp, color = TextGray, fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         }
 
                                         Column(
@@ -356,10 +402,17 @@ fun DevicesScreen(
                                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(32.dp)
+                                                .height(44.dp)
                                                 .testTag("topology_panel_toggle_btn")
                                         ) {
-                                            Text(if (node.isTrusted) "Block / Demote Trust" else "Authorize / Trust Node", fontSize = 11.sp, color = DarkBg, fontWeight = FontWeight.Bold)
+                                            Text(
+                                                if (node.isTrusted) "Block / Demote Trust" else "Authorize / Trust Node",
+                                                fontSize = 11.sp,
+                                                color = DarkBg,
+                                                fontWeight = FontWeight.Bold,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
                                         }
                                     }
                                 }
@@ -385,6 +438,8 @@ fun DevicesScreen(
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextWhite,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
@@ -431,9 +486,6 @@ fun NetworkTopologyMap(
         val heightPx = constraints.maxHeight.toFloat()
 
         val density = LocalDensity.current
-        val widthDp = with(density) { widthPx.toDp() }
-        val heightDp = with(density) { heightPx.toDp() }
-
         // Find standard gateway & clients
         val gatewayNode = devices.firstOrNull { it.isGateway } ?: devices.firstOrNull() ?: DeviceEntity(
             macAddress = "00:00:00:00:00:00", ipAddress = "192.168.1.1", hostname = "gateway.default", vendor = "Generic", isTrusted = true, isGateway = true, lastSeen = 0
@@ -488,13 +540,13 @@ fun NetworkTopologyMap(
 
         // 2. Lay down Interactive nodes using offsets
         // Central Gateway Router Node
-        val gatewayX = with(density) { centerXPx.toDp() } - 24.dp
-        val gatewayY = with(density) { startYPx.toDp() } - 24.dp
+        val gatewayX = with(density) { centerXPx.toDp() } - 26.dp
+        val gatewayY = with(density) { startYPx.toDp() } - 26.dp
 
         Box(
             modifier = Modifier
                 .offset(x = gatewayX, y = gatewayY)
-                .size(48.dp)
+                .size(52.dp)
                 .clip(RectangleShape)
                 .background(Brush.radialGradient(listOf(CyberPrimary.copy(alpha = 0.35f), DarkBg)))
                 .border(2.dp, CyberPrimary, RectangleShape)
@@ -516,8 +568,8 @@ fun NetworkTopologyMap(
             val nodeXPx = centerXPx + radiusPx * cos(angle).toFloat()
             val nodeYPx = startYPx + radiusPx * sin(angle).toFloat()
 
-            val nodeX = with(density) { nodeXPx.toDp() } - 20.dp
-            val nodeY = with(density) { nodeYPx.toDp() } - 20.dp
+            val nodeX = with(density) { nodeXPx.toDp() } - 22.dp
+            val nodeY = with(density) { nodeYPx.toDp() } - 22.dp
 
             val isSelected = selectedDevice?.macAddress == client.macAddress
             val statusColor = if (client.isTrusted) CyberPrimary else CyberRed
@@ -526,7 +578,7 @@ fun NetworkTopologyMap(
             Box(
                 modifier = Modifier
                     .offset(x = nodeX, y = nodeY)
-                    .size(40.dp)
+                        .size(44.dp)
                     .clip(RectangleShape)
                     .background(DarkSurfaceElevated)
                     .border(
@@ -552,7 +604,7 @@ fun NetworkTopologyMap(
                 // Tiny indicator label matching the layout
                 Box(
                     modifier = Modifier
-                        .offset(y = 22.dp)
+                        .offset(y = 24.dp)
                         .clip(RoundedCornerShape(0.dp))
                         .background(DarkBg.copy(alpha = 0.85f))
                         .border(0.5.dp, statusColor.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
@@ -691,19 +743,25 @@ fun DeviceRow(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = "OS: ${device.osFingerprint}",
                         fontSize = 10.sp,
                         color = TextWhite,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
                     Text(
                         text = "TYPE: ${device.deviceType}",
                         fontSize = 10.sp,
                         color = CyberCyan,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(0.85f)
                     )
                 }
 
@@ -716,7 +774,10 @@ fun DeviceRow(
                         text = "Stack signature: ${device.ttlFingerprint}",
                         fontSize = 9.sp,
                         color = TextGray,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = FontFamily.Monospace,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
                     
                     if (!isOwnAgent && !device.isGateway) {
@@ -725,13 +786,16 @@ fun DeviceRow(
                                 .clip(RoundedCornerShape(0.dp))
                                 .background(if (!device.isTrusted) CyberGreen.copy(alpha = 0.15f) else CyberRed.copy(alpha = 0.15f))
                                 .clickable { onTrustToggle() }
-                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                .heightIn(min = 36.dp)
+                                .padding(horizontal = 8.dp, vertical = 8.dp)
                         ) {
                             Text(
                                 text = if (!device.isTrusted) "Authorize Node" else "Revoke Trust",
                                 fontSize = 9.sp,
                                 color = if (!device.isTrusted) CyberGreen else CyberRed,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -740,7 +804,9 @@ fun DeviceRow(
                     text = "OS family: ${device.osFamily} ${device.osVersion} | confidence ${device.fingerprintConfidence}% | care ${device.careState}",
                     fontSize = 9.sp,
                     color = CyberPrimary,
-                    fontFamily = FontFamily.Monospace
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = "Traits: ${device.stackTraits}",
@@ -766,14 +832,18 @@ fun NetworkParamLabel(
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
             color = TextGray,
-            letterSpacing = 0.8.sp
+            letterSpacing = 0.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Text(
             text = value,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = TextWhite,
-            fontFamily = FontFamily.Monospace
+            fontFamily = FontFamily.Monospace,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

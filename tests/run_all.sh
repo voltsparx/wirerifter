@@ -16,7 +16,8 @@ cd "$ROOT"
 
 step "Repository hygiene"
 if has_command rg; then
-  if rg -n "wireshark|Wireshark|nmap|Nmap|NetSentry|netsentry|Gemini|firebase" app/src/main README.md docs LICENSE metadata.json; then
+  PATTERN='wire''shark|Wire''shark|n''map|N''map|Net''Sentry|net''sentry|Gem''ini|fire''base'
+  if rg -n "$PATTERN" app/src/main README.md docs LICENSE metadata.json; then
     printf "Repository hygiene scan found blocked legacy references.\n" >&2
     exit 1
   else
